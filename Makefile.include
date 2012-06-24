@@ -66,8 +66,9 @@ programfilesdir = $(pkglibdir)
 programfiles_DATA = $(ASSEMBLY)
 bin_SCRIPTS = $(BINARIES)
 
-programfilesdir = @libdir@/@PACKAGE@
-programfiles_DATA = $(PROGRAMFILES)
+# This is the second definition of these variables:
+#programfilesdir = @libdir@/@PACKAGE@
+#programfiles_DATA = $(PROGRAMFILES)
 linuxpkgconfigdir = @libdir@/pkgconfig
 linuxpkgconfig_DATA = $(LINUX_PKGCONFIG)
 

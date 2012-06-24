@@ -42,7 +42,6 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Template.Text\" />
-    <Folder Include="Template.Text\Test\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

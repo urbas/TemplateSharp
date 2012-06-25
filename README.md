@@ -14,8 +14,6 @@ only when a large number of strings will be created.
 
 ## Example 1: simplicity
 
-__TODO__: _The following is not yet implemented:_
-
 The simplest way to use Template# is with plain classes:
 
     var template = Templates.Compile<Song>("[C?<{0:00} of {1:00} - >Track Number,Tracks Count][Artist] - [C?<{0} - >Album][Title].[FileExtension]");

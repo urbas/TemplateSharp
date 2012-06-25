@@ -16,9 +16,9 @@ only when a large number of strings will be created.
 
 __TODO__: _The following is not yet implemented:_
 
-The simplest way to use Template# is with plain classes.
+The simplest way to use Template# is with plain classes:
 
-    var template = Templates.Compile<Song>("[CC<{0:00} - >Track Number][Artist] - [CC<{0} - >Album][Title].[FileExtension]");
+    var template = Templates.Compile<Song>("[C?<{0:00} of {1:00} - >Track Number,Tracks Count][Artist] - [C?<{0} - >Album][Title].[FileExtension]");
     List<Song> songs;
     ...
     foreach (Song song in songs) {
@@ -29,28 +29,32 @@ Where the class `Song` could look something like this:
 
     public class Song
     {
+        // This property maps to the parameter `Title`
         public string Title { get; }
         
-        [TemplateParameter(Name = "Track Number")]
+        // With annotations one can modify name binding:
+        [TemplateParameter(name = "Track Number")]
         public int? TrackNumber { get; }
     
-        [TemplateParameter(Property = "Name")]
+        // The class `Artist` must have a `get` property `Name`.
+        [TemplateParameter(property = "Name")]
         public Person Artist { get; }
         
-        [TemplateParameter(Property = "Title")]
-        [TemplateParameter(Name = "AlbumYear", Property = "Title")]
-        [TemplateParameter(Name = "TracksCount", Property = "TracksCount")]
+        // The `Album` class must have the properties `Title`, `Year`, and `TracksCount`.
+        [TemplateParameter(property = "Title")] // This will map the `Album` parameter to `Album.Title`
+        [TemplateParameter(name = "Album Year", property = "Year")]
+        [TemplateParameter(name = "Tracks Count", property = "TracksCount")]
         public Album Album { get; }
     }
 
-The above may produce something like this:
+The above will produce something like this:
 
     > ...
-    > 01 - Queen - The Works - Radio Ga Ga.mp3
+    > 01 of 12 - Queen - The Works - Radio Ga Ga.mp3
     > Ray Charles - I Can't Stop Loving You.ogg
     > ...
 
-Note that placeholders like `[CC<format>parameter]` placeholer will be omitted if the `parameter` is `null`.
+Note that placeholders like `[C?<format>parameter]` placeholer will be omitted if the `parameter` is `null` (i.e.: `C` stands for complex format and `?` stands for _conditional_).
 
 
 ## Example 2: speed

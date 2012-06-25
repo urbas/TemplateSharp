@@ -24,6 +24,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using System.Collections.Generic;
+using Mono.Unix;
 
 namespace Template.Text
 {
@@ -32,10 +34,33 @@ namespace Template.Text
     /// </summary>
     public static class Templates
     {
+        #region Template Compilation
         public static ICompiledTemplate<T> Compile<T> (string template, LookupMap<T> dataLookupMap = null, string templateEngine = null)
         {
-            return null;
+            if (dataLookupMap == null) {
+                dataLookupMap = SimpleDataLookup.SimpleLookupMap<T>;
+            }
+            if (templateEngine == null) {
+                templateEngine = DefaultEngine;
+            }
+            Type engineType;
+            if (!engines.TryGetValue (templateEngine, out engineType)) {
+                throw new ArgumentException (string.Format (Catalog.GetString ("Could not compile the template. Template engine '{0}' is unknown."), templateEngine));
+            }
+            ITemplateEngine<T> te = (ITemplateEngine<T>)Activator.CreateInstance (engineType.MakeGenericType (typeof(T)));
+            return te.CompileTemplate (template, dataLookupMap);
         }
+        #endregion
+
+        #region Template Engine Registry
+        private static readonly Dictionary<string, Type> engines = new Dictionary<string, Type> ();
+        private const string DefaultEngine = TemplateEngineV1<object>.CompilerName;
+
+        static Templates ()
+        {
+            engines.Add (TemplateEngineV1<object>.CompilerName, typeof(TemplateEngineV1<>));
+        }
+        #endregion
     }
 }
 

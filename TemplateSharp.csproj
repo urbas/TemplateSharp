@@ -35,6 +35,7 @@
     <Reference Include="nunit.framework">
       <Package>mono-nunit</Package>
     </Reference>
+    <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
@@ -69,5 +70,7 @@
   <ItemGroup>
     <None Include="TemplateSharp.make" />
     <None Include="TemplateSharp.config" />
+    <None Include="Makefile.am" />
+    <None Include="Makefile.include" />
   </ItemGroup>
 </Project>

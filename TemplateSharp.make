@@ -62,13 +62,11 @@ RESOURCES =
 EXTRAS = \
 	templatesharp.pc.in 
 
-REFERENCES =  \
-	System \
-	Mono.Posix
+REFERENCES = $(TEMPLATESHARP_REFS)
 
 if ENABLE_TESTS
 FILES += $(TEMPLATESHARP_TESTS)
-REFERENCES += $(NUNIT_LIBS)
+REFERENCES += $(TEMPALTESHARP_TEST_REFS)
 endif
 
 DLL_REFERENCES = 
@@ -94,6 +92,8 @@ $(ASSEMBLY): $(build_sources) $(build_resources) $(build_datafiles) $(DLL_REFERE
 
 if ENABLE_TESTS
 test-templatesharp: $(ASSEMBLY)
+	pushd $(shell dirname $(ASSEMBLY))
 	nunit-console $(ASSEMBLY)
+	popd
 
 endif

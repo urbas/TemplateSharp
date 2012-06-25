@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 using System;
 using System.Text;
+using System.IO;
 
 namespace Template.Text
 {
@@ -41,15 +42,32 @@ namespace Template.Text
 
         /// <summary>
         /// Creates a string by filling out placeholders with data provided by the data source.
+        /// This method builds the string with the given string builder. The same string builder
+        /// can be cleared after a call to this method and reused in calling this method again.
+        /// Doing this can greatly increase performance (when compared to the `string CreateString(T)`
+        /// method).
         /// </summary>
         void CreateString(StringBuilder output, T dataSource);
+
+        /// <summary>
+        /// Returns a string by filling out the placeholders in this template with the data
+        /// provided by the `dataSource` object.
+        /// </summary>
+        string CreateString(T dataSource);
+
+        /// <summary>
+        /// Creates a string by filling out placeholders with data provided by the data source.
+        /// This method builds the string into the given text writer (useful for writing strings
+        /// to streams and similar).
+        /// </summary>
+        void CreateString(TextWriter output, T dataSource);
     }
 
     /// <summary>
     /// A simple and stupid implementation of the compiled template interface.
     /// Can be used by implementors for simplicity sake.
     /// </summary>
-    public class CompiledTemplate<T> : ICompiledTemplate<T>
+    public abstract class CompiledTemplate<T> : ICompiledTemplate<T>
     {
         public CompiledTemplate(string source)
         {
@@ -63,8 +81,17 @@ namespace Template.Text
 
         public virtual void CreateString (StringBuilder output, T dataSource)
         {
-            output.Append(Source);
+            CreateString(new StringWriter(output), dataSource);
         }
+
+        public virtual string CreateString (T dataSource)
+        {
+            StringWriter sw = new StringWriter();
+            CreateString(sw, dataSource);
+            return sw.ToString();
+        }
+
+        public abstract void CreateString (TextWriter output, T dataSource);
     }
 }
 

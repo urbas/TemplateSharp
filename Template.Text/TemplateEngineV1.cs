@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using Mono.Unix;
 using System.Text;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace Template.Text
 {
@@ -106,6 +107,14 @@ namespace Template.Text
                 segments [i].ToStringAppend (output, dataSource);
             }
         }
+
+        public override void CreateString (TextWriter output, T dataSource)
+        {
+            int segmentsCount = segments.Count;
+            for (int i = 0; i < segmentsCount; i++) {
+                segments [i].ToStringAppend (output, dataSource);
+            }
+        }
         #endregion
     }
     #endregion
@@ -130,6 +139,8 @@ namespace Template.Text
         string ToString (T dataSource);
 
         void ToStringAppend (StringBuilder output, T dataSource);
+
+        void ToStringAppend (TextWriter output, T dataSource);
     }
 
     public abstract class TemplateSegmentV1<T> : ITemplateSegmentV1<T>
@@ -149,6 +160,11 @@ namespace Template.Text
         public virtual void ToStringAppend (StringBuilder output, T dataSource)
         {
             output.Append (ToString (dataSource));
+        }
+
+        public virtual void ToStringAppend (TextWriter output, T dataSource)
+        {
+            output.Write (ToString (dataSource));
         }
 
         protected TemplateCompilationException CreateException (string message, Exception cause = null)
@@ -173,6 +189,11 @@ namespace Template.Text
         public override void ToStringAppend (StringBuilder output, T dataSource)
         {
             output.Append (RawContent);
+        }
+
+        public override void ToStringAppend (TextWriter output, T dataSource)
+        {
+            output.Write (RawContent);
         }
 
         public string RawContent { get; private set; }

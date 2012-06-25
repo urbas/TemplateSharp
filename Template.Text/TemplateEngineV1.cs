@@ -67,15 +67,15 @@ namespace Template.Text
                     "\n" +
                     "-   [parameter name]: simple parameter (it is interpolated with track's info directly).\n" +
                     "-   [F<format>parameter name]: formatted parameter. Uses .NET's format string.\n" +
-                    "-   [FC<format>parameter name]: same as above but not interpolated if parameter is not given for the song.\n" +
+                    "-   [F?<format>parameter name]: same as above but not interpolated if parameter is not given for the song.\n" +
                     "-   [C<format>P1,P2,...]: complex formatted parameter. Uses  .NET's composite format syntax.\n" +
-                    "-   [CC<format>P1,P2,...]: same as above but not interpolated if parameter is not given for the song.\n" +
+                    "-   [C?<format>P1,P2,...]: same as above but not interpolated if parameter is not given for the song.\n" +
                     "\n" +
                     "Some examples:\n" +
                     "\n" +
                     @"-   [home]/Music/[artist] - [album] - [title]" + "\n" +
                     @"-   [directory]/[F<00>track number] - [artist] - [album] - [title]" + "\n" +
-                    @"-   [directory]/[CC<{{0:00}} - >track number][artist] - [album] - [title]"
+                    @"-   [directory]/[C?<{{0:00}} - >track number][artist] - [album] - [title]"
                     ), Name);
             }
         }
@@ -255,9 +255,9 @@ namespace Template.Text
         {
             placeholderTypeRegistry.Add ("", (pt, i, dlm, h, f, ps) => new SimplePlaceholderV1<T> (pt, i, dlm, h, f, ps));
             placeholderTypeRegistry.Add ("F", (pt, i, dlm, h, f, ps) => new SimpleFormatPlaceholderV1<T> (false, pt, i, dlm, h, f, ps));
-            placeholderTypeRegistry.Add ("FC", (pt, i, dlm, h, f, ps) => new SimpleFormatPlaceholderV1<T> (true, pt, i, dlm, h, f, ps));
+            placeholderTypeRegistry.Add ("F?", (pt, i, dlm, h, f, ps) => new SimpleFormatPlaceholderV1<T> (true, pt, i, dlm, h, f, ps));
             placeholderTypeRegistry.Add ("C", (pt, i, dlm, h, f, ps) => new FormatPlaceholderV1<T> (false, pt, i, dlm, h, f, ps));
-            placeholderTypeRegistry.Add ("CC", (pt, i, dlm, h, f, ps) => new FormatPlaceholderV1<T> (true, pt, i, dlm, h, f, ps));
+            placeholderTypeRegistry.Add ("C?", (pt, i, dlm, h, f, ps) => new FormatPlaceholderV1<T> (true, pt, i, dlm, h, f, ps));
         }
     }
 

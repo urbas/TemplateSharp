@@ -4,7 +4,7 @@
 
 if ENABLE_DEBUG
 ASSEMBLY_COMPILER_COMMAND = dmcs
-ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize- -debug "-define:DEBUG;"
+ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize- -debug "-define:DEBUG"
 ASSEMBLY = bin/Debug/TemplateSharp.dll
 ASSEMBLY_MDB = $(ASSEMBLY).mdb
 COMPILE_TARGET = library
@@ -13,6 +13,10 @@ BUILD_DIR = bin/Debug
 
 TEMPLATESHARP_DLL_MDB_SOURCE=bin/Debug/TemplateSharp.dll.mdb
 TEMPLATESHARP_DLL_MDB=$(BUILD_DIR)/TemplateSharp.dll.mdb
+
+if ENABLE_TESTS
+ASSEMBLY_COMPILER_FLAGS += "-define:ENABLE_TESTS"
+endif
 
 endif
 
@@ -26,6 +30,10 @@ PROJECT_REFERENCES =
 BUILD_DIR = bin/Release
 
 TEMPLATESHARP_DLL_MDB=
+
+if ENABLE_TESTS
+ASSEMBLY_COMPILER_FLAGS += "-define:ENABLE_TESTS"
+endif
 
 endif
 
@@ -43,12 +51,9 @@ RESGEN=resgen2
 	
 all: $(ASSEMBLY) $(PROGRAMFILES) $(LINUX_PKGCONFIG) 
 
-FILES = \
-	AssemblyInfo.cs \
-	Template.Text/ICompiledTemplate.cs \
-	Template.Text/ITemplateEngine.cs \
-	Template.Text/TemplateEngineV1.cs \
-	Template.Text/TemplateCompilationException.cs 
+include TemplateSharp.config
+
+FILES = $(TEMPLATESHARP_CS) $(TEMPLATESHARP_ASSEMBLYINFO)
 
 DATA_FILES = 
 
@@ -60,6 +65,11 @@ EXTRAS = \
 REFERENCES =  \
 	System \
 	Mono.Posix
+
+if ENABLE_TESTS
+FILES += $(TEMPLATESHARP_TESTS)
+REFERENCES += $(NUNIT_LIBS)
+endif
 
 DLL_REFERENCES = 
 
@@ -81,3 +91,9 @@ $(ASSEMBLY_MDB): $(ASSEMBLY)
 $(ASSEMBLY): $(build_sources) $(build_resources) $(build_datafiles) $(DLL_REFERENCES) $(PROJECT_REFERENCES) $(build_xamlg_list) $(build_satellite_assembly_list)
 	mkdir -p $(shell dirname $(ASSEMBLY))
 	$(ASSEMBLY_COMPILER_COMMAND) $(ASSEMBLY_COMPILER_FLAGS) -out:$(ASSEMBLY) -target:$(COMPILE_TARGET) $(build_sources_embed) $(build_resources_embed) $(build_references_ref)
+
+if ENABLE_TESTS
+test-templatesharp: $(ASSEMBLY)
+	nunit-console $(ASSEMBLY)
+
+endif

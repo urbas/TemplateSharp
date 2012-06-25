@@ -9,13 +9,14 @@
     <OutputType>Library</OutputType>
     <RootNamespace>TemplateSharp</RootNamespace>
     <AssemblyName>TemplateSharp</AssemblyName>
+    <ReleaseVersion>1.3</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants>DEBUG;ENABLE_TESTS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -31,6 +32,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Mono.Posix" />
+    <Reference Include="nunit.framework">
+      <Package>mono-nunit</Package>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
@@ -38,10 +42,14 @@
     <Compile Include="Template.Text\ITemplateEngine.cs" />
     <Compile Include="Template.Text\TemplateEngineV1.cs" />
     <Compile Include="Template.Text\TemplateCompilationException.cs" />
+    <Compile Include="Template.Text\Tests\TemplateEngineV1Test.cs" />
+    <Compile Include="Template.Text\Templates.cs" />
+    <Compile Include="Template.Text\SimpleDataLookup.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Template.Text\" />
+    <Folder Include="Template.Text\Tests\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
@@ -58,4 +66,8 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <ItemGroup>
+    <None Include="TemplateSharp.make" />
+    <None Include="TemplateSharp.config" />
+  </ItemGroup>
 </Project>

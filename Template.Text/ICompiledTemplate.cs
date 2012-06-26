@@ -69,6 +69,12 @@ namespace Template.Text
     /// </summary>
     public abstract class CompiledTemplate<T> : ICompiledTemplate<T>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Template.Text.CompiledTemplate`1"/> class.
+        /// </summary>
+        /// <param name='source'>
+        /// The string form of the template.
+        /// </param>
         public CompiledTemplate(string source)
         {
             Source = source;

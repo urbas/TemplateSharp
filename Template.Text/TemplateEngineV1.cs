@@ -469,8 +469,7 @@ namespace Template.Text
 
         private bool NextChar ()
         {
-            ++currentIndex;
-            return currentIndex < templateLength;
+            return ++currentIndex < templateLength;
         }
 
         private void NextSegment ()
@@ -478,6 +477,8 @@ namespace Template.Text
             buffer.Clear ();
             currentSegmentStartIndex = currentIndex;
         }
+
+        private bool IsLastChar { get { return currentIndex == templateLength - 1; } }
 
         private void ConsumeChar ()
         {
@@ -489,11 +490,6 @@ namespace Template.Text
             string bufferContent = buffer.ToString ();
             buffer.Clear ();
             return bufferContent;
-        }
-
-        private TemplateCompilationException CreateHereException (string message)
-        {
-            return new TemplateCompilationException (message, inputTemplate, CurrentIndex);
         }
 
         private void ConsumeSegment (TemplateSegmentV1<T> segment)
@@ -523,16 +519,35 @@ namespace Template.Text
             parameterNames.Clear ();
         }
 
+        private TemplateCompilationException CreateHereException (string message)
+        {
+            return new TemplateCompilationException (message, inputTemplate, CurrentIndex);
+        }
+
+        private void CheckDanglingEscapeSequence ()
+        {
+            if (IsLastChar) {
+                throw CreateHereException (Catalog.GetString ("An illegal escape sequence at the end of the template."));
+            }
+        }
+
         private int processLiteral ()
         {
             switch (CurrentChar) {
             case TemplateV1<T>.EscapeChar:
+                CheckDanglingEscapeSequence ();
                 return StateLiteralEscape;
             case PlaceholderV1<T>.PlaceholderStartChar:
+                if (IsLastChar) {
+                    throw CreateHereException (Catalog.GetString ("Illegal start of a placeholder at the end of the template."));
+                }
                 ConsumeLiteralSegment ();
                 return StatePlaceholderHeader;
             default:
                 ConsumeChar ();
+                if (IsLastChar) {
+                    ConsumeLiteralSegment ();
+                }
                 return StateLiteral;
             }
         }
@@ -543,9 +558,19 @@ namespace Template.Text
             case TemplateV1<T>.EscapeChar:
             case PlaceholderV1<T>.PlaceholderStartChar:
                 ConsumeChar ();
+                if (IsLastChar) {
+                    ConsumeLiteralSegment ();
+                }
                 return StateLiteral;
             default:
                 throw CreateHereException (Catalog.GetString ("An illegal escape sequence."));
+            }
+        }
+
+        private void CheckDanglingOpenPlaceholder()
+        {
+            if (IsLastChar) {
+                throw CreateHereException (Catalog.GetString ("An unfinished placeholder at the end of the template."));
             }
         }
 
@@ -553,11 +578,14 @@ namespace Template.Text
         {
             switch (CurrentChar) {
             case TemplateV1<T>.EscapeChar:
+                CheckDanglingEscapeSequence ();
                 return StatePlaceholderHeaderEscape;
             case PlaceholderV1<T>.HeaderParametersDelimiter:
+                CheckDanglingOpenPlaceholder ();
                 placeholderHeader = ConsumeBuffer ();
                 return StatePlaceholderParameter;
             case PlaceholderV1<T>.FormatStartChar:
+                CheckDanglingOpenPlaceholder ();
                 placeholderHeader = ConsumeBuffer ();
                 return StatePlaceholderFormat;
             case PlaceholderV1<T>.PlaceholderEndChar:
@@ -565,6 +593,7 @@ namespace Template.Text
                 ConsumePlaceholder ();
                 return StateLiteral;
             default:
+                CheckDanglingOpenPlaceholder ();
                 ConsumeChar ();
                 return StatePlaceholderHeader;
             }
@@ -576,6 +605,7 @@ namespace Template.Text
             case TemplateV1<T>.EscapeChar:
             case PlaceholderV1<T>.FormatStartChar:
             case PlaceholderV1<T>.HeaderParametersDelimiter:
+                CheckDanglingOpenPlaceholder ();
                 ConsumeChar ();
                 return StatePlaceholderHeader;
             default:
@@ -587,13 +617,16 @@ namespace Template.Text
         {
             switch (CurrentChar) {
             case TemplateV1<T>.EscapeChar:
+                CheckDanglingEscapeSequence ();
                 return StatePlaceholderFormatEscape;
             case PlaceholderV1<T>.FormatEndChar:
+                CheckDanglingOpenPlaceholder ();
                 placeholderFormat = ConsumeBuffer ();
                 return StatePlaceholderParameter;
             case PlaceholderV1<T>.PlaceholderEndChar:
                 throw CreateHereException (Catalog.GetString ("Found an incomplete format specification."));
             default:
+                CheckDanglingOpenPlaceholder ();
                 ConsumeChar ();
                 return StatePlaceholderFormat;
             }
@@ -604,6 +637,7 @@ namespace Template.Text
             switch (CurrentChar) {
             case TemplateV1<T>.EscapeChar:
             case PlaceholderV1<T>.FormatEndChar:
+                CheckDanglingOpenPlaceholder ();
                 ConsumeChar ();
                 return StatePlaceholderFormat;
             default:
@@ -615,8 +649,10 @@ namespace Template.Text
         {
             switch (CurrentChar) {
             case TemplateV1<T>.EscapeChar:
+                CheckDanglingEscapeSequence ();
                 return StatePlaceholderParameterEscape;
             case PlaceholderV1<T>.ParameterDelimiter:
+                CheckDanglingOpenPlaceholder ();
                 ConsumeParameter ();
                 return StatePlaceholderParameter;
             case PlaceholderV1<T>.PlaceholderEndChar:
@@ -624,6 +660,7 @@ namespace Template.Text
                 ConsumePlaceholder ();
                 return StateLiteral;
             default:
+                CheckDanglingOpenPlaceholder ();
                 ConsumeChar ();
                 return StatePlaceholderParameter;
             }
@@ -635,6 +672,7 @@ namespace Template.Text
             case TemplateV1<T>.EscapeChar:
             case PlaceholderV1<T>.PlaceholderEndChar:
             case PlaceholderV1<T>.ParameterDelimiter:
+                CheckDanglingOpenPlaceholder ();
                 ConsumeChar ();
                 return StatePlaceholderParameter;
             default:

@@ -43,6 +43,8 @@ namespace Template.Text
             if (templateEngine == null) {
                 templateEngine = DefaultEngine;
             }
+            // Template engines are generic types. This is why we have to use
+            // reflection to create instances.
             Type engineType;
             if (!engines.TryGetValue (templateEngine, out engineType)) {
                 throw new ArgumentException (string.Format (Catalog.GetString ("Could not compile the template. Template engine '{0}' is unknown."), templateEngine));

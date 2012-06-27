@@ -370,8 +370,15 @@ namespace Template.Text
 
         private static string ProcessFormat (string formatPart)
         {
-            if (formatPart.IndexOf (AlignmentFormatDelimiter) < 0) {
+            if (string.IsNullOrEmpty(formatPart)) {
+                return "{0}";
+            }
+
+            int delimiterIndex = formatPart.IndexOf (AlignmentFormatDelimiter);
+            if (delimiterIndex < 0) {
                 return "{0:" + formatPart + "}";
+            } else if (delimiterIndex == formatPart.Length - 1) {
+                return "{0," + formatPart.Substring(0, delimiterIndex) + "}";
             } else {
                 return "{0," + formatPart + "}";
             }

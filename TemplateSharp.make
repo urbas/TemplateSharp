@@ -91,9 +91,6 @@ $(ASSEMBLY): $(build_sources) $(build_resources) $(build_datafiles) $(DLL_REFERE
 	$(ASSEMBLY_COMPILER_COMMAND) $(ASSEMBLY_COMPILER_FLAGS) -out:$(ASSEMBLY) -target:$(COMPILE_TARGET) $(build_sources_embed) $(build_resources_embed) $(build_references_ref)
 
 if ENABLE_TESTS
-test-templatesharp: $(ASSEMBLY)
-	pushd $(shell dirname $(ASSEMBLY))
+test: $(ASSEMBLY)
 	nunit-console $(ASSEMBLY)
-	popd
-
 endif

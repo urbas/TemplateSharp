@@ -35,11 +35,11 @@ using System.Text;
 namespace Template.Text
 {
     [TestFixture]
- public class TemplateEngineV1Test
+ 	public class TemplateEngineV1Test
     {
         #region Test Templates
-        private const string Template_Ok_1_General = @"[F?<00>Track Number][C?< of {0:00}>Track Count][C?< - >Track Number][Artist] - [Album] [C?<({0})>Album Year] - [Title] - Title uppercased: [TITLE], Title lowercased: [title], Title Length: [Title Length], TITLE length: [TITLE Length], Direct property access:[LowercasedTitle], Direct field access:[TrackNumber], Direct method access:[GetUppercasedTitle]";
-        private const string Template_Ok_2_Simple = @"[F?<00>Track Number][C?< of {0:00}>Track Count][C?< - >Track Number][Artist] - [Album] [C?<({0})>Album Year] - [Title]";
+        private const string Template_Ok_1_General = @"[F?<00>Track Number][?< of {0:00}>Track Count][C?< - >Track Number][Artist] - [Album] [?<({0})>Album Year] - [Title] - Title uppercased: [TITLE], Title lowercased: [title], Title Length: [Title Length], TITLE length: [TITLE Length], Direct property access:[LowercasedTitle], Direct field access:[TrackNumber], Direct method access:[GetUppercasedTitle]";
+        private const string Template_Ok_2_Simple = @"[F?<00>Track Number][?< of {0:00}>Track Count][C?< - >Track Number][Artist] - [Album] [?<({0})>Album Year] - [Title]";
         #endregion
 
         #region Test Data
@@ -95,7 +95,7 @@ namespace Template.Text
             TestTemplate(Template_Ok_2_Simple, (i, str) => NUnit.Framework.Assert.AreEqual(expectedStrings_2_Simple[i], str, string.Format("At song number {0}", i)));
         }
 
-        public void TestTemplate(string stringTempalte, Action<int, string> checkExpected)
+        private void TestTemplate(string stringTempalte, Action<int, string> checkExpected)
         {
             var template = Templates.Compile<Song>(stringTempalte);
             StringBuilder sb = new StringBuilder();

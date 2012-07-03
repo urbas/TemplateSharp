@@ -56,8 +56,6 @@ fi
 dnl package checks, common for all configs
 PKG_CHECK_MODULES([MONO], [mono >= 2.10.5])
 PKG_CHECK_MODULES([DOTNET35], [dotnet35 >= 2.10.5])
-dnl PKG_CHECK_MODULES([GTK_SHARP_20], [gtk-sharp-2.0])
-dnl PKG_CHECK_MODULES([GTK_DOTNET_20], [gtk-dotnet-2.0])
 
 dnl package checks, per config
 if test "x$enable_tests" = "xyes" ; then

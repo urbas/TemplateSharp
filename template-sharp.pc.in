@@ -1,5 +1,5 @@
-Name: TemplateSharp
-Description: TemplateSharp
+Name: template-sharp
+Description: Lightweight .NET library for mass string creation from templates
 Version: @PACKAGE_VERSION@
 
 Requires: 

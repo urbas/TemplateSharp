@@ -1,4 +1,4 @@
-Name:           templatesharp
+Name:           template-sharp
 Version:        @PACKAGE_VERSION@
 Release:        1%{?dist}
 Summary:        Lightweight .NET library for mass string creation from templates
@@ -14,6 +14,8 @@ ExclusiveArch:  %ix86 x86_64 ppc ppc64 ia64 %{arm} sparcv9 alpha s390x
 TemplateSharp is a simple and lightweight library for mass string creation
 through templates.
 
+
+
 %package devel
 Summary:        Development files for TemplateSharp
 Group:          Development/Libraries
@@ -26,9 +28,12 @@ through templates.
 
 The %{name}-devel package contains development files for %{name}.
 
+
+
 %package devel-doc
 Summary:        TemplateSharp development documentation
 Group:          Documentation
+Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-devel = %{version}-%{release}
 
 %description devel-doc
@@ -56,11 +61,11 @@ make DESTDIR=%{buildroot} install
 
 %files
 %defattr(-,root,root,-)
-%{_libdir}/templatesharp/
+%{_libdir}/template-sharp/
 
 %files devel
 %defattr(-,root,root,-)
-%{_libdir}/pkgconfig/templatesharp.pc
+%{_libdir}/pkgconfig/template-sharp.pc
 
 %files devel-doc
 %doc %{_defaultdocdir}/%{name}/README.html

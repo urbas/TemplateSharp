@@ -69,7 +69,7 @@
     <None Include="TemplateSharp.config" />
     <None Include="Makefile.am" />
     <None Include="Makefile.include" />
-    <None Include="templatesharp.pc.in" />
+    <None Include="template-sharp.pc.in" />
     <None Include="configure.ac" />
   </ItemGroup>
 </Project>

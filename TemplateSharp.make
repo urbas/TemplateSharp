@@ -62,7 +62,7 @@ DATA_FILES =
 RESOURCES = 
 
 EXTRAS = \
-	templatesharp.pc.in \
+	template-sharp.pc.in \
     $(TEMPLATESHARP_MARKDOWNS)
 
 REFERENCES = $(TEMPLATESHARP_REFS)
@@ -78,9 +78,9 @@ CLEANFILES = $(PROGRAMFILES) $(LINUX_PKGCONFIG) $(TEMPLATESHARP_MARKDOWNHTMLS)
 
 include $(top_srcdir)/Makefile.include
 
-TEMPLATESHARP_PC = $(BUILD_DIR)/templatesharp.pc
+TEMPLATESHARP_PC = $(BUILD_DIR)/template-sharp.pc
 
-$(eval $(call emit-deploy-wrapper,TEMPLATESHARP_PC,templatesharp.pc))
+$(eval $(call emit-deploy-wrapper,TEMPLATESHARP_PC,template-sharp.pc))
 
 
 $(eval $(call emit_resgen_targets))

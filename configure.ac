@@ -1,7 +1,7 @@
 dnl Warning: This is an automatically generated file, do not edit!
 dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ([2.54])
-AC_INIT([TemplateSharp], [1.0.2])
+AC_INIT([template-sharp], [1.0.2])
 AM_INIT_AUTOMAKE([foreign])
 AM_MAINTAINER_MODE
 
@@ -64,10 +64,10 @@ fi
 
 
 AC_CONFIG_FILES([
-templatesharp.pc
+template-sharp.pc
 Makefile
 AssemblyInfo.cs
-packaging/Fedora/templatesharp.spec
+packaging/Fedora/template-sharp.spec
 ])
 
 AC_OUTPUT

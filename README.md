@@ -1,7 +1,7 @@
 Template#
 =========
 
-__Template# is a simple and lightweight library for mass string creation through templates.__
+>   __Template# is a simple and lightweight library for mass string creation through templates.__
 
 Here is an example template (a song filename template):
 
@@ -9,10 +9,12 @@ Here is an example template (a song filename template):
 
 Template# is useful when a lot of strings have to be created using the same template.
 
+## Scenario
+
 The following scenario illustrates the kind of use-case this library was designed for:
 
->   Say we have a big library of audio files with bad filenames. We want to fix this
->   by naming the files like this: '[TrackNumber] - [Artist] - [Album] - [Title]'.
+>   _Say we have a big library of audio files with bad filenames. We want to fix this
+>   by naming the files like this: '[TrackNumber] - [Artist] - [Album] - [Title]'._
 
 Elements enclosed within `[` and `]` brackets are called _placeholders_. These
 are replaced by extracting concrete values from all the processed songs.
@@ -29,11 +31,10 @@ which contains all concrete values for the above placeholders:
 
 Just having this class is enough to start building templated strings with it.
 Template# looks up data for all the placeholders by inspecting the properties,
-fields and even parameterless methods of the `Song` class. If Template# finds
-a corresponding property, field or method it will use it to fill out the
-placeholder with it.
+fields and even parameterless functions of the `Song` class. If Template# finds
+a corresponding class member it will use it to fill out the placeholder with it.
 
-Here is a concrete example:
+__Here is a concrete example__:
 
     List<Song> songs = ...;
     var template = Templates.Compile<Song>("[TrackNumber] - [Artist] - [Album] - [Title]");
@@ -41,23 +42,34 @@ Here is a concrete example:
         Console.WriteLine(template.CreateString(song));
     }
 
-Dynamic binding of instance members with placeholders can be quite slow if it is
-performed through reflection-based binding for each call of the
-`template.CreateString(song)` method. To avoid this Template# uses the compilation
-stage. It binds the placeholders with the `Song`'s properties only once and
-creates a function which directly accesses the property, field or the method.
-This is achieved with the help of _expression trees_. In essence, expression
-trees are functions which are created and compiled at runtime.
+The parameter `song` in the function call `template.CreateString(song)` is
+called __data source object__. It contains the concrete values for parameters
+in placeholders.
 
-However, the above is not the only or the most performant use of Template#. Look
-at examples below to learn more about additional features and most optimised
-uses of Template#.
+## Why is Template# fast?
+
+Template# compiles its templates first. Afterwards the compiled templates can be
+used repeatedly to create a lot of strings as swiftly as possible.
+
+__But what happens in the compilation stage?__
+
+The most important part of the compilation stage is baking-in of the binding of
+placeholders with their concrete values. The concrete values are stored in the
+data source object and have to be looked up for each data source object when the
+strings are being created. We call this process _dynamic binding_.
+
+However, dynamic binding can be quite slow if it is performed through
+reflection. To avoid this Template# binds the placeholders with the `Song`'s
+properties only once and creates a baked function which directly accesses the
+property, field or function. This is achieved with the help of _expression
+trees_. In essence, expression trees are functions which are created and
+compiled at runtime.
 
 ## Example 1: simplicity
 
 The simplest way to use Template# is with plain classes:
 
-    var template = Templates.Compile<Song>("[C?<{0:00} of {1:00} - >Track Number,Tracks Count][Artist] - [C?<{0} - >Album][Title].[FileExtension]");
+    var template = Templates.Compile<Song>("[?<{0:00} of {1:00} - >Track Number,Tracks Count][Artist] - [?<{0} - >Album][Title].[FileExtension]");
     List<Song> songs;
     ...
     foreach (Song song in songs) {
@@ -93,7 +105,7 @@ The above will produce something like this:
     > Ray Charles - I Can't Stop Loving You.ogg
     > ...
 
-Note that placeholders like `[C?<format>parameter]` placeholer will be omitted if the `parameter` is `null` (i.e.: `C` stands for complex format and `?` stands for _conditional_).
+Note that placeholders like `[?<format>parameter]` placeholer will be omitted if the `parameter` is `null` (i.e.: `C` stands for complex format and `?` stands for _conditional_).
 
 
 ## Example 2: speed

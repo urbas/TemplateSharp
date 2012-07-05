@@ -7,10 +7,9 @@ License:        MIT
 URL:            https://github.com/urbas/TemplateSharp
 Source0:        https://github.com/downloads/urbas/TemplateSharp/%{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:  mono-devel
-
+BuildRequires:  mono-devel python-markdown
+#Requires:       mono-core >= 2.10.5
 ExclusiveArch:  %ix86 x86_64 ppc ppc64 ia64 %{arm} sparcv9 alpha s390x
-
 %description
 TemplateSharp is a simple and lightweight library for mass string creation
 through templates.
@@ -26,6 +25,18 @@ TemplateSharp is a simple and lightweight library for mass string creation
 through templates.
 
 The %{name}-devel package contains development files for %{name}.
+
+%package devel-doc
+Summary:        TemplateSharp development documentation
+Group:          Documentation
+Requires:       %{name}-devel = %{version}-%{release}
+
+%description devel-doc
+TemplateSharp is a simple and lightweight library for mass string creation
+through templates.
+
+The %{name}-devel-doc package contains usage information for development
+files of %{name}.
 
 
 
@@ -50,6 +61,9 @@ make DESTDIR=%{buildroot} install
 %files devel
 %defattr(-,root,root,-)
 %{_libdir}/pkgconfig/templatesharp.pc
+
+%files devel-doc
+%doc %{_defaultdocdir}/%{name}/README.html
 
 %changelog
 * Thu Jul 5 2012 Matej Urbas <matej.urbas@gmail.com> - 1.0.2-1

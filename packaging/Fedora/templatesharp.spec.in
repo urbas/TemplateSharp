@@ -1,0 +1,50 @@
+Name:           templatesharp
+Version:        @PACKAGE_VERSION@
+Release:        1%{?dist}
+Summary:        Lightweight .NET library for mass string creation from templates.
+Group:		    Development/Libraries
+License:        MIT
+URL:            https://github.com/urbas/TemplateSharp
+Source0:        https://github.com/downloads/urbas/TemplateSharp/%{name}-%{version}.tar.gz
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRequires:  mono-devel
+
+ExclusiveArch:  %ix86 x86_64 ppc ppc64 ia64 %{arm} sparcv9 alpha s390x
+
+%description
+TemplateSharp is a simple and lightweight library for mass string creation
+through templates.
+
+%package devel
+Summary:        Development files for TemplateSharp
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
+Requires:       pkgconfig
+
+%description devel
+TemplateSharp is a simple and lightweight library for mass string creation
+through templates.
+
+The %{name}-devel package contains development files for %{name}.
+
+
+%prep
+%setup -q
+
+
+%build
+%configure
+make %{?_smp_mflags}
+
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make install DESTDIR=$RPM_BUILD_ROOT
+
+
+%files
+%doc
+
+
+
+%changelog

@@ -1,6 +1,7 @@
 Name: TemplateSharp
 Description: TemplateSharp
-Version: 1.0.0
+Version: @PACKAGE_VERSION@
 
 Requires: 
 Libs: -r:@expanded_libdir@/@PACKAGE@/TemplateSharp.dll
+Libraries=@expanded_libdir@/@PACKAGE@/TemplateSharp.dll

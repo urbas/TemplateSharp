@@ -8,7 +8,6 @@ URL:            https://github.com/urbas/TemplateSharp
 Source0:        https://github.com/downloads/urbas/TemplateSharp/%{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  mono-devel python-markdown
-#Requires:       mono-core >= 2.10.5
 ExclusiveArch:  %ix86 x86_64 ppc ppc64 ia64 %{arm} sparcv9 alpha s390x
 %description
 TemplateSharp is a simple and lightweight library for mass string creation

@@ -17,6 +17,11 @@ SHAMROCK_EXPAND_DATADIR
 
 AC_PROG_INSTALL
 
+AC_PATH_PROG(MARKDOWN, markdown, no)
+if test "x$MARKDOWN" = "xno"; then
+        AC_MSG_ERROR([markdown not found])
+fi
+
 AC_PATH_PROG(DMCS, dmcs, no)
 if test "x$DMCS" = "xno"; then
         AC_MSG_ERROR([dmcs Not found])

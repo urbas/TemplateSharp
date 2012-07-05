@@ -1,8 +1,8 @@
 Name:           templatesharp
 Version:        @PACKAGE_VERSION@
 Release:        1%{?dist}
-Summary:        Lightweight .NET library for mass string creation from templates.
-Group:		    Development/Libraries
+Summary:        Lightweight .NET library for mass string creation from templates
+Group:          Development/Libraries
 License:        MIT
 URL:            https://github.com/urbas/TemplateSharp
 Source0:        https://github.com/downloads/urbas/TemplateSharp/%{name}-%{version}.tar.gz
@@ -28,23 +28,29 @@ through templates.
 The %{name}-devel package contains development files for %{name}.
 
 
+
 %prep
 %setup -q
 
-
 %build
-%configure
-make %{?_smp_mflags}
-
+%configure --enable-debug
+make
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
+%{__rm} -rf %{buildroot}
+make DESTDIR=%{buildroot} install
 
+%clean
+%{__rm} -rf %{buildroot}
 
 %files
-%doc
+%defattr(-,root,root,-)
+%{_libdir}/templatesharp/
 
-
+%files devel
+%defattr(-,root,root,-)
+%{_libdir}/pkgconfig/templatesharp.pc
 
 %changelog
+* Thu Jul 5 2012 Matej Urbas <matej.urbas@gmail.com> - 1.0.2-1
+- Initial package

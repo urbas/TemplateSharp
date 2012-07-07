@@ -3,7 +3,7 @@
 # Warning: This is an automatically generated file, do not edit!
 
 if ENABLE_DEBUG
-ASSEMBLY_COMPILER_COMMAND = dmcs
+ASSEMBLY_COMPILER_COMMAND = $(CSC)
 ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize- -debug "-define:DEBUG"
 ASSEMBLY = bin/Debug/TemplateSharp.dll
 ASSEMBLY_MDB = $(ASSEMBLY).mdb
@@ -21,7 +21,7 @@ endif
 endif
 
 if ENABLE_RELEASE
-ASSEMBLY_COMPILER_COMMAND = dmcs
+ASSEMBLY_COMPILER_COMMAND = $(CSC)
 ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize-
 ASSEMBLY = bin/Release/TemplateSharp.dll
 ASSEMBLY_MDB = 
@@ -99,4 +99,4 @@ test: $(ASSEMBLY)
 endif
 
 .md.html:
-	markdown $< > $@
+	$(MARKDOWN) $< > $@

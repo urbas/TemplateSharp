@@ -17,17 +17,33 @@ SHAMROCK_EXPAND_DATADIR
 
 AC_PROG_INSTALL
 
-AC_PATH_PROG(MARKDOWN, markdown, no)
-if test "x$MARKDOWN" = "xno"; then
+
+
+# Find the markdown compiler:
+AC_ARG_VAR(MARKDOWN, [The program with which to build the README.md documentation [default=markdown_py]])
+if test -z $MARKDOWN; then
+    MARKDOWN=markdown_py
+fi
+AC_PATH_PROG(MARKDOWN_FOUND, $MARKDOWN, no)
+if test "x$MARKDOWN_FOUND" = "xno"; then
         AC_MSG_ERROR([markdown not found])
 fi
 
-AC_PATH_PROG(DMCS, dmcs, no)
-if test "x$DMCS" = "xno"; then
-        AC_MSG_ERROR([dmcs Not found])
+
+
+# Find the C# compiler:
+AC_ARG_VAR(CSC, [The CS compiler [default=dmcs]])
+if test -z $CSC; then
+    CSC=dmcs
+fi
+AC_PATH_PROG(CSC_FOUND, $CSC, no)
+if test "x$CSC" = "xno"; then
+        AC_MSG_ERROR([CS compiler not found])
 fi
 
 
+
+# Determine which configuration we should use:
 AC_ARG_ENABLE(debug,
 	AC_HELP_STRING([--enable-debug],
 		[Use 'DEBUG' Configuration [default=YES]]),
@@ -58,14 +74,17 @@ if test -z "$CONFIG_REQUESTED" ; then
 fi
 
 
+
 dnl package checks, common for all configs
 PKG_CHECK_MODULES([MONO], [mono >= 2.10.5])
 PKG_CHECK_MODULES([DOTNET35], [dotnet35 >= 2.10.5])
+
 
 dnl package checks, per config
 if test "x$enable_tests" = "xyes" ; then
         PKG_CHECK_MODULES([NUNIT],[mono-nunit >= 2.10.0])
 fi
+
 
 
 AC_CONFIG_FILES([

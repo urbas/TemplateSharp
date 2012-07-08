@@ -20,13 +20,14 @@ AC_PROG_INSTALL
 
 
 # Find the markdown compiler:
-AC_ARG_VAR(MARKDOWN, [The program with which to build the README.md documentation [default=markdown_py]])
+AC_ARG_VAR(MARKDOWN, [The program with which to build the README.md documentation])
 if test -z $MARKDOWN; then
-    MARKDOWN=markdown_py
+    AC_PATH_PROGS(MARKDOWN, [markdown markdown_py markdown2], no)
+else
+    AC_PATH_PROG(MARKDOWN, $MARKDOWN, no)
 fi
-AC_PATH_PROG(MARKDOWN_FOUND, $MARKDOWN, no)
-if test "x$MARKDOWN_FOUND" = "xno"; then
-        AC_MSG_ERROR([markdown not found])
+if test "x$MARKDOWN" = "xno"; then
+    AC_MSG_ERROR([markdown not found])
 fi
 
 
@@ -82,7 +83,7 @@ PKG_CHECK_MODULES([DOTNET35], [dotnet35 >= 2.10.5])
 
 dnl package checks, per config
 if test "x$enable_tests" = "xyes" ; then
-        PKG_CHECK_MODULES([NUNIT],[mono-nunit >= 2.10.0])
+        PKG_CHECK_MODULES([NUNIT],[mono-nunit >= 2.5.0])
 fi
 
 

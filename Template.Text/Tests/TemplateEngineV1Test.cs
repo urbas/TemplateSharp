@@ -38,8 +38,8 @@ namespace Template.Text
  	public class TemplateEngineV1Test
     {
         #region Test Templates
-        private const string Template_Ok_1_General = @"[F?<00>Track Number][?< of {0:00}>Track Count][C?< - >Track Number][Artist] - [Album] [?<({0})>Album Year] - [Title] - Title uppercased: [TITLE], Title lowercased: [title], Title Length: [Title Length], TITLE length: [TITLE Length], Direct property access:[LowercasedTitle], Direct field access:[TrackNumber], Direct method access:[GetUppercasedTitle]";
-        private const string Template_Ok_2_Simple = @"[F?<00>Track Number][?< of {0:00}>Track Count][C?< - >Track Number][Artist] - [Album] [?<({0})>Album Year] - [Title]";
+        private const string Template_Ok_1_General = @"[F?<00>Track Number][?< of {0:00}>Track Count][?< - >Track Number][Artist] - [Album] [?<({0})>Album Year] - [Title] - Title uppercased: [TITLE], Title lowercased: [title], Title Length: [Title Length], TITLE length: [TITLE Length], Direct property access:[LowercasedTitle], Direct field access:[TrackNumber], Direct method access:[GetUppercasedTitle]";
+        private const string Template_Ok_2_Simple = @"[F?<00>Track Number][?< of {0:00}>Track Count][?< - >Track Number][Artist] - [Album] [?<({0})>Album Year] - [Title]";
         #endregion
 
         #region Test Data

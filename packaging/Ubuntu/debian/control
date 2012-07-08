@@ -1,0 +1,42 @@
+Source:             template-sharp
+Section:            cli-mono
+Priority:           extra
+Maintainer:         Matej Urbas <matej.urbas@gmail.com>
+Build-Depends:      debhelper (>= 8.0.0),
+                    autotools-dev,
+                    mono-devel (>= 2.10.8.1),
+                    markdown
+Standards-Version:  3.9.2
+Homepage:           https://github.com/urbas/TemplateSharp
+Vcs-Browser:        https://github.com/urbas/TemplateSharp
+Vcs-Git:            git://github.com/urbas/TemplateSharp.git
+Description: Lightweight .NET library for mass string creation from templates
+ TemplateSharp is a simple and lightweight library for mass string creation through templates.
+
+Package:            template-sharp
+Section:            libs
+Architecture:       all
+Depends:            ${cli:Depends},
+                    ${misc:Depends}
+Description: Lightweight .NET library for mass string creation from templates
+ TemplateSharp is a simple and lightweight library for mass string creation through templates.
+
+Package:            template-sharp-dev
+Section:            libdevel
+Architecture:       all
+Depends:            template-sharp (= ${binary:Version})
+Description: Development files for TemplateSharp
+ TemplateSharp is a simple and lightweight library for mass string creation
+ through templates.
+ .
+ The template-sharp-devel package contains development files for template-sharp.
+
+Package:            template-sharp-dev-doc
+Section:            doc
+Architecture:       all
+Depends:            template-sharp (= ${binary:Version})
+Description: Usage documentation for development with TemplateSharp.
+ TemplateSharp is a simple and lightweight library for mass string creation
+ through templates.
+ .
+ The template-sharp-devel package contains development files for template-sharp.

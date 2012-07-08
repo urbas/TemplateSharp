@@ -31,7 +31,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Mono.Posix" />
-    <Reference Include="nunit.framework" />
+    <Reference Include="nunit.framework">
+      <Package>mono-nunit</Package>
+    </Reference>
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>

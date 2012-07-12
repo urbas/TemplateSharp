@@ -1,3 +1,9 @@
+template-sharp (1.0.4-0ubuntu1) unstable; urgency=low
+
+  * Fixed dependencies
+
+ -- Matej Urbas <matej.urbas@gmail.com>  Thu, 12 Jul 2012 16:42:51 +0100
+
 template-sharp (1.0.3-0ubuntu1) unstable; urgency=low
 
   * Initial release

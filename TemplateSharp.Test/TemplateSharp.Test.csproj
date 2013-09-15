@@ -44,6 +44,7 @@
     <Compile Include="Song.cs" />
     <Compile Include="Artist.cs" />
     <Compile Include="Album.cs" />
+    <Compile Include="MemberLookupTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TemplateSharp.csproj">

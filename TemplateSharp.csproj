@@ -43,6 +43,8 @@
     <Compile Include="Template.Text\SimpleDataLookup.cs" />
     <Compile Include="Template.Text\CompiledTemplate.cs" />
     <Compile Include="Template.Text\TemplateParameter.cs" />
+    <Compile Include="Template.Text\MemberLookup.cs" />
+    <Compile Include="Template.Text\ExpressionExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

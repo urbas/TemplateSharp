@@ -37,7 +37,7 @@ namespace Template.Text
 		public static ICompiledTemplate<T> Compile<T> (string template, LookupMap<T> dataLookupMap = null, string templateEngine = null)
 		{
 			if (dataLookupMap == null) {
-				dataLookupMap = SimpleDataLookup.SimpleLookupMap<T>;
+                dataLookupMap = new SimpleDataLookup<T>().CreateValueLookup;
 			}
 
 			if (templateEngine == null) {

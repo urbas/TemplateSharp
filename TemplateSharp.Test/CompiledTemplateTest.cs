@@ -8,8 +8,8 @@ namespace Template.Text
     public class CompiledTemplateTest
     {
         const string FooBar = "foo bar";
-        private FakeCompiledTemplate fakeCompiledTemplate;
 
+        private FakeCompiledTemplate fakeCompiledTemplate;
 
         class FakeCompiledTemplate : CompiledTemplate<Object>
         {
@@ -45,7 +45,7 @@ namespace Template.Text
         }
 
         [Test]
-        public void CreateString_with_stringBuilder_returns_the_template_with_toString_of_object_appended ()
+        public void CreateString_with_stringBuilder_returns_the_template_string_with_toString_of_object_appended ()
         {
             var testDataSource = "zar mar";
             var stringBuilder = new StringBuilder();

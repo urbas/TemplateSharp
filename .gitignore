@@ -2,5 +2,28 @@
 bin
 obj
 
-# mstest test results
-TestResults
+# NUnit test results
+test-results
+TestResult.xml
+
+# MonoDevelop User-specific stuff
+TemplateSharp.userprefs
+
+# AutoTools Generated Files
+AssemblyInfo.cs
+aclocal.m4
+install-sh
+Makefile
+Makefile.in
+autom4te.cache
+config.log
+config.status
+configure
+missing
+
+# Distribution files:
+*.pc
+*.tar.gz
+
+# README
+README.html

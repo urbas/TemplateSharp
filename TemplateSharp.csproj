@@ -7,8 +7,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{D37CB841-7539-4BD2-94ED-9A3F7AF565C7}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>TemplateSharp</RootNamespace>
     <AssemblyName>TemplateSharp</AssemblyName>
+    <RootNamespace>Template.Text</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,9 +31,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Mono.Posix" />
-    <Reference Include="nunit.framework">
-      <Package>mono-nunit</Package>
-    </Reference>
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
@@ -42,14 +39,14 @@
     <Compile Include="Template.Text\ITemplateEngine.cs" />
     <Compile Include="Template.Text\TemplateEngineV1.cs" />
     <Compile Include="Template.Text\TemplateCompilationException.cs" />
-    <Compile Include="Template.Text\Tests\TemplateEngineV1Test.cs" />
     <Compile Include="Template.Text\Templates.cs" />
     <Compile Include="Template.Text\SimpleDataLookup.cs" />
+    <Compile Include="Template.Text\CompiledTemplate.cs" />
+    <Compile Include="Template.Text\TemplateParameter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Template.Text\" />
-    <Folder Include="Template.Text\Tests\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
@@ -73,5 +70,6 @@
     <None Include="Makefile.include" />
     <None Include="template-sharp.pc.in" />
     <None Include="configure.ac" />
+    <None Include="README.md" />
   </ItemGroup>
 </Project>

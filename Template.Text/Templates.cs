@@ -29,40 +29,38 @@ using Mono.Unix;
 
 namespace Template.Text
 {
-    /// <summary>
-    /// The main hub of Template#. This class provides factory methods for template compilation.
-    /// </summary>
-    public static class Templates
-    {
-        #region Template Compilation
-        public static ICompiledTemplate<T> Compile<T> (string template, LookupMap<T> dataLookupMap = null, string templateEngine = null)
-        {
-            if (dataLookupMap == null) {
-                dataLookupMap = SimpleDataLookup.SimpleLookupMap<T>;
-            }
-            if (templateEngine == null) {
-                templateEngine = DefaultEngine;
-            }
-            // Template engines are generic types. This is why we have to use
-            // reflection to create instances.
-            Type engineType;
-            if (!engines.TryGetValue (templateEngine, out engineType)) {
-                throw new ArgumentException (string.Format (Catalog.GetString ("Could not compile the template. Template engine '{0}' is unknown."), templateEngine));
-            }
-            ITemplateEngine<T> te = (ITemplateEngine<T>)Activator.CreateInstance (engineType.MakeGenericType (typeof(T)));
-            return te.CompileTemplate (template, dataLookupMap);
-        }
-        #endregion
+	/// <summary>
+	/// The main usage entry of Template#. This class provides factory methods for template compilation.
+	/// </summary>
+	public static class Templates
+	{
+		public static ICompiledTemplate<T> Compile<T> (string template, LookupMap<T> dataLookupMap = null, string templateEngine = null)
+		{
+			if (dataLookupMap == null) {
+				dataLookupMap = SimpleDataLookup.SimpleLookupMap<T>;
+			}
 
-        #region Template Engine Registry
-        private static readonly Dictionary<string, Type> engines = new Dictionary<string, Type> ();
-        private const string DefaultEngine = TemplateEngineV1<object>.CompilerName;
+			if (templateEngine == null) {
+				templateEngine = DefaultEngine;
+			}
 
-        static Templates ()
-        {
-            engines.Add (TemplateEngineV1<object>.CompilerName, typeof(TemplateEngineV1<>));
-        }
-        #endregion
-    }
+			// Template engines are generic types. This is why we have to use
+			// reflection to create instances.
+			Type engineType;
+			if (!engines.TryGetValue (templateEngine, out engineType)) {
+				throw new ArgumentException (string.Format (Catalog.GetString ("Could not compile the template. Template engine '{0}' is unknown."), templateEngine));
+			}
+			ITemplateEngine<T> te = (ITemplateEngine<T>)Activator.CreateInstance (engineType.MakeGenericType (typeof(T)));
+			return te.CompileTemplate (template, dataLookupMap);
+		}
+
+		private static readonly Dictionary<string, Type> engines = new Dictionary<string, Type> ();
+		private const string DefaultEngine = TemplateEngineV1<object>.CompilerName;
+
+		static Templates ()
+		{
+			engines.Add (TemplateEngineV1<object>.CompilerName, typeof(TemplateEngineV1<>));
+		}
+	}
 }
 

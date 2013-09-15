@@ -37,8 +37,9 @@ AC_ARG_VAR(CSC, [The CS compiler [default=dmcs]])
 if test -z $CSC; then
     CSC=dmcs
 fi
-AC_PATH_PROG(CSC_FOUND, $CSC, no)
-if test "x$CSC" = "xno"; then
+
+AC_PATH_PROG(CSC_PATH, $CSC, no)
+if test "x$CSC_PATH" = "xno"; then
         AC_MSG_ERROR([CS compiler not found])
 fi
 
@@ -81,9 +82,22 @@ PKG_CHECK_MODULES([MONO], [mono >= 2.10.5])
 PKG_CHECK_MODULES([DOTNET35], [dotnet35 >= 2.10.5])
 
 
+
 dnl package checks, per config
+
+dnl NUnit Tests
+AC_ARG_VAR(NUNIT_CONSOLE, [The NUnit console executable [default=nunit-console]])
+if test -z $NUNIT_CONSOLE; then
+    NUNIT_CONSOLE=nunit-console
+fi
+
 if test "x$enable_tests" = "xyes" ; then
-        PKG_CHECK_MODULES([NUNIT],[mono-nunit >= 2.5.0])
+        PKG_CHECK_MODULES([NUNIT],[nunit >= 2.6.0])
+
+        AC_PATH_PROG(NUNIT_CONSOLE_PATH, $NUNIT_CONSOLE, no)
+		if test "x$NUNIT_CONSOLE_PATH" = "xno"; then
+		        AC_MSG_ERROR([NUnit console executable not found])
+		fi
 fi
 
 

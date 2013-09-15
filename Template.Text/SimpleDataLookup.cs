@@ -25,7 +25,9 @@
 // THE SOFTWARE.
 using System;
 using System.Reflection;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Collections.Generic;
 
 namespace Template.Text
 {
@@ -40,177 +42,137 @@ namespace Template.Text
         /// </summary>
         public static Lookup<T> SimpleLookupMap<T> (string parameter)
         {
-            // This method uses reflection to map the `parameter` to (parameterless) members
-            // of `T`.
-            Type clazz = typeof(T);
+            var props = FindReadableProperties<T> ();
+            var methods = FindParameterlessFunctions<T> ();
+            var fields = typeof(T).GetFields (BindingFlagsOfMembersToInspect);
 
-            // Find the first property which maps to the parameter name:
-            var props = clazz.GetProperties (BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
+            var allMembers = props.Concat (methods).Concat (fields);
+
+            var lookup = CreateLookupLambdaForMemberExplicitlyBoundToParameter<T> (allMembers, parameter);
+            if (lookup != null)
+                return lookup;
+
+            foreach (var prop in allMembers) {
+                if (string.Equals (parameter, prop.Name)) {
+                    return CreateDirectMemberLookupLambda<T> (prop);
+                }
+            }
+
+            return null;
+        }
+
+        private const BindingFlags BindingFlagsOfMembersToInspect = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance;
+
+        public static IEnumerable<MemberInfo> FindReadableProperties<T> ()
+        {
+            var props = typeof(T).GetProperties (BindingFlagsOfMembersToInspect);
+            
             if (props != null && props.Length > 0) {
-                foreach (var prop in props) {
-                    if (prop.CanRead) {
-                        // Find all properties that have the TP attribute with a name binding:
-                        var attrs = prop.GetCustomAttributes (typeof(TemplateParameter), true);
-                        if (attrs != null && attrs.Length > 0) {
-                            foreach (TemplateParameter tpa in attrs) {
-                                // Is this property bound to the sought parameter?
-                                if (tpa.Name == null ? string.Equals(prop.Name, parameter) : string.Equals (tpa.Name, parameter)) {
-                                    // Yes, it is! Just return it's lookup function:
-                                    // Is it a direct value?
-                                    if (tpa.Property == null) {
-                                        // Yes, just return the value of the property:
-                                        var param = Expression.Parameter (typeof(T), "dataSourceObject");
-                                        return Expression.Lambda<Lookup<T>> (param.Property (prop).As<object> (), param).Compile ();
-                                    } else {
-                                        // Nope, we have to return the submember:
-                                        /* Returns this:
-                                        return dso => {
-                                            var tmp;
-                                            if (dso == null)
-                                              return null;
-                                            tmp = dso.Property;
-                                            if (tmp == null)
-                                              return null;
-                                            return tmp.SubMember;
-                                        }
-                                        */
-                                        var param = Expression.Parameter (typeof(T), "dso");
-                                        var tmpVariable = Expression.Variable (prop.PropertyType, "tmpVariable");
-                                        var propertyValue = param.Property (prop).AssignTo (tmpVariable);
-                                        var getBlock = Expression.Block (
-                                            typeof(object),
-                                            new ParameterExpression[]{ tmpVariable },
-                                            param.IfNotNull (propertyValue.IfNotNull (tmpVariable.Member (tpa.Property).As<object> ())));
-                                        return Expression.Lambda<Lookup<T>> (getBlock, param).Compile ();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                return (from prop in props where prop.CanRead select prop).ToArray ();
+            } else {
+                return new PropertyInfo[]{};
             }
+        }
 
-            var fields = clazz.GetFields (BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
-            if (fields != null && fields.Length > 0) {
-                foreach (var field in fields) {
-                    // Find all fields that have the TP attribute with a name binding:
-                    var attrs = field.GetCustomAttributes (typeof(TemplateParameter), true);
-                    if (attrs != null && attrs.Length > 0) {
-                        foreach (TemplateParameter tpa in attrs) {
-                            // Is this field bound to the sought parameter?
-                            if (tpa.Name == null ? string.Equals(field.Name, parameter) : string.Equals (tpa.Name, parameter)) {
-                                // Yes, it is! Just return it's lookup function:
-                                // Is it a direct value?
-                                if (tpa.Property == null) {
-                                    // Yes, just return the value of the field:
-                                    var param = Expression.Parameter(typeof(T), "dataSourceObject");
-                                    return Expression.Lambda<Lookup<T>>(param.Field(field).As<object>(), param).Compile();
-                                } else {
-                                    // Nope, we have to return the submember:
-                                    var param = Expression.Parameter(typeof(T), "dso");
-                                    var tmpVariable = Expression.Variable(field.FieldType, "tmpVariable");
-                                    var propertyValue = param.Field(field).AssignTo(tmpVariable);
-                                    var getBlock = Expression.Block(
-                                        typeof(object),
-                                        new ParameterExpression[]{ tmpVariable },
-                                        param.IfNotNull(propertyValue.IfNotNull(tmpVariable.Member(tpa.Property).As<object>())));
-                                    return Expression.Lambda<Lookup<T>>(getBlock, param).Compile();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            var methods = clazz.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
+        public static IEnumerable<MemberInfo> FindParameterlessFunctions<T> ()
+        {
+            var methods = typeof(T).GetMethods (BindingFlagsOfMembersToInspect);
+            
             if (methods != null && methods.Length > 0) {
-                foreach (var method in methods) {
-                    // Find all methods that have the TP attribute with a name binding:
-                    var attrs = method.GetCustomAttributes (typeof(TemplateParameter), true);
-                    if (attrs != null && attrs.Length > 0) {
-                        foreach (TemplateParameter tpa in attrs) {
-                            // Is this method bound to the sought parameter?
-                            if (tpa.Name == null ? string.Equals(method.Name, parameter) : string.Equals (tpa.Name, parameter)) {
-                                // Yes, it is! Just return it's lookup function:
-                                // Is it a direct value?
-                                if (tpa.Property == null) {
-                                    // Yes, just return the value of the method:
-                                    var param = Expression.Parameter(typeof(T), "dataSourceObject");
-                                    return Expression.Lambda<Lookup<T>>(method.InvokeOn(param).As<object>(), param).Compile();
-                                } else {
-                                    // Nope, we have to return the submember:
-                                    var param = Expression.Parameter(typeof(T), "dso");
-                                    var tmpVariable = Expression.Variable(method.ReturnType, "tmpVariable");
-                                    var callValue = method.InvokeOn(param).AssignTo(tmpVariable);
-                                    var getBlock = Expression.Block(
-                                        typeof(object),
-                                        new ParameterExpression[]{ tmpVariable },
-                                        param.IfNotNull(callValue.IfNotNull(tmpVariable.Member(tpa.Property).As<object>())));
-                                    return Expression.Lambda<Lookup<T>>(getBlock, param).Compile();
-                                }
-                            }
-                        }
+                return (from method
+                        in methods
+                        where method.GetParameters ().Length == 0 && !method.Name.StartsWith ("get_") && method.ReturnType != typeof(void)
+                        select method).ToArray ();
+            } else {
+                return new MemberInfo[]{};
+            }
+        }
+
+        public static Tuple<MemberInfo, TemplateParameter> FindMemberExplicitlyBoundToParameter (IEnumerable<MemberInfo> classMembers, string parameter)
+        {
+            foreach (var memberInfo in classMembers) {
+                var templateParameterAttributes = memberInfo.GetCustomAttributes (typeof(TemplateParameter), true);
+
+                foreach (TemplateParameter templateParameterAttribute in templateParameterAttributes) {
+                    if (IsMemberExplicitlyBoundToParameter (memberInfo, templateParameterAttribute, parameter)) {
+                        return new Tuple<MemberInfo, TemplateParameter> (memberInfo, templateParameterAttribute);
                     }
                 }
             }
 
-            // Now find direct bindings (properties, fields and methods that bind to parameters without the help of TP attributes):
-            if (props != null && props.Length > 0) {
-                foreach (var prop in props) {
-                    if (prop.CanRead && string.Equals(parameter, prop.Name)) {
-                        var param = Expression.Parameter (typeof(T), "dataSourceObject");
-                        return Expression.Lambda<Lookup<T>> (param.Property (prop).As<object> (), param).Compile ();
-                    }
-                }
-            }
-            if (fields != null && fields.Length > 0) {
-                foreach (var field in fields) {
-                    if (string.Equals(parameter, field.Name)) {
-                        var param = Expression.Parameter (typeof(T), "dataSourceObject");
-                        return Expression.Lambda<Lookup<T>> (param.Field (field).As<object> (), param).Compile ();
-                    }
-                }
-            }
-            if (methods != null && methods.Length > 0) {
-                foreach (var method in methods) {
-                    if (string.Equals(parameter, method.Name)) {
-                        var param = Expression.Parameter (typeof(T), "dataSourceObject");
-                        return Expression.Lambda<Lookup<T>> (method.InvokeOn(param).As<object> (), param).Compile ();
-                    }
-                }
+            return null;
+        }
+
+        public static bool IsMemberExplicitlyBoundToParameter (MemberInfo member, TemplateParameter parameterBindingAttribute, string parameter)
+        {
+            return string.Equals (parameterBindingAttribute.Name, parameter) || (parameterBindingAttribute.Name == null && string.Equals (member.Name, parameter));
+        }
+
+        public static Lookup<T> CreateLookupLambdaForMemberExplicitlyBoundToParameter<T> (IEnumerable<MemberInfo> props, string parameter)
+        {
+            var memberInfoWithAttribute = FindMemberExplicitlyBoundToParameter (props, parameter);
+            if (memberInfoWithAttribute != null) {
+                var propertyBoundToParameter = memberInfoWithAttribute.Item1;
+                var templateParameterAttribute = memberInfoWithAttribute.Item2;
+                return CreateParameterLookupLambda<T> (templateParameterAttribute, propertyBoundToParameter);
             }
             return null;
         }
 
-        #region Helper Expression Methods (static, private)
-        private static Expression EqualsNull (this Expression exp)
+        public static Lookup<T> CreateParameterLookupLambda<T> (TemplateParameter parameterBindingInfo, MemberInfo memberBoundToParameter)
         {
-            return Expression.Equal (exp, Null ());
+            if (parameterBindingInfo.Property == null) {
+                return CreateDirectMemberLookupLambda<T> (memberBoundToParameter);
+            } else {
+                return ConstructSubmemberAccessLambda<T> (memberBoundToParameter, parameterBindingInfo.Property);
+            }
         }
 
-        private static ConstantExpression Null ()
+        public static Lookup<T> CreateDirectMemberLookupLambda<T> (MemberInfo propertyBoundToParameter)
         {
-            return Expression.Constant (null);
+            var dataSourceObject = Expression.Parameter (typeof(T), "dataSourceObject");
+            return Expression.Lambda<Lookup<T>> (dataSourceObject.Member (propertyBoundToParameter).As<object> (), dataSourceObject).Compile ();
         }
+
+        public static Lookup<T> ConstructSubmemberAccessLambda<T> (MemberInfo memberBoundToParameter, string submemberName)
+        {
+            /* Returns this:
+            return dataSourceObject => {
+                var tmp;
+                if (dataSourceObject != null) {
+                    tmp = dataSourceObject.Member;
+                    if (tmp != null) {
+                        return tmp.SubMember;
+                    }
+                }
+                return null;
+            }
+            */
+            var dataSourceObject = Expression.Parameter (typeof(T), "dso");
+
+            var returnTypeOfMember = GetReturnTypeOf (memberBoundToParameter);
+
+            var memberReturnValue = Expression.Variable (returnTypeOfMember, "memberReturnValue");
+            var submemberValue = memberReturnValue.Member (submemberName).As<object> ();
+            var assignMemberReturnValue = dataSourceObject.Member (memberBoundToParameter).AssignTo (memberReturnValue);
+
+            var ifMemberNull = assignMemberReturnValue.IfNullThenElse (Null, submemberValue);
+            var ifDataSourceObjectNull = dataSourceObject.IfNullThenElse (Null, ifMemberNull);
+
+            var getBlock = Expression.Block (typeof(object), new ParameterExpression[]{ memberReturnValue }, ifDataSourceObjectNull);
+            return Expression.Lambda<Lookup<T>> (getBlock, dataSourceObject).Compile ();
+        }
+
+        private static Expression EqualsNull (this Expression exp)
+        {
+            return Expression.Equal (exp, Null);
+        }
+
+        private static readonly ConstantExpression Null = Expression.Constant (null);
 
         private static Expression As<AsType> (this Expression exp)
         {
             return Expression.TypeAs (exp, typeof(AsType));
-        }
-
-        private static Expression PropertyOrField (this Expression exp, string propertyOrFieldName)
-        {
-            return Expression.PropertyOrField (exp, propertyOrFieldName);
-        }
-
-        private static Expression Property (this Expression exp, PropertyInfo propInfo)
-        {
-            return Expression.Property (exp, propInfo);
-        }
-
-        private static Expression IfNullThenElse<T> (this Expression exp, Expression ifNull, Expression ifNonNull)
-        {
-            return Expression.Condition (exp.EqualsNull (), ifNull, ifNonNull, typeof(T));
         }
 
         private static Expression IfNullThenElse (this Expression exp, Expression ifNull, Expression ifNonNull)
@@ -223,53 +185,37 @@ namespace Template.Text
             return Expression.Assign (to, exp);
         }
 
-        private static Expression IfNotNull (this Expression exp, Expression ifNotNull)
+        private static Expression Member (this Expression exp, MemberInfo memberInfo)
         {
-            return exp.IfNullThenElse (Null (), ifNotNull);
+            if (memberInfo is PropertyInfo)
+                return Expression.Property (exp, (PropertyInfo)memberInfo);
+            else if (memberInfo is FieldInfo)
+                return Expression.Field (exp, (FieldInfo)memberInfo);
+            else if (memberInfo is MethodInfo)
+                return Expression.Call (exp, (MethodInfo)memberInfo);
+            else
+                throw new ArgumentException ("Unknown member.", "memberInfo");
         }
 
-        private static Expression IfNotNull<T> (this Expression exp, Expression ifNotNull)
+        private static Expression Member (this Expression exp, string memberName)
         {
-            return exp.IfNullThenElse<T> (Null (), ifNotNull);
-        }
-
-        private static Expression Field (this Expression exp, FieldInfo fieldInfo)
-        {
-            return Expression.Field (exp, fieldInfo);
-        }
-
-        private static Expression InvokeOn(this MethodInfo method, Expression instance)
-        {
-            return Expression.Call(instance, method);
-        }
-
-        private static Expression Member(this Expression exp, string propertyOrFieldOrMethod)
-        {
-            try
-            {
-                return exp.PropertyOrField(propertyOrFieldOrMethod);
-            }
-            catch (ArgumentException)
-            {
-                return Expression.Call(exp, propertyOrFieldOrMethod, null);
+            try {
+                return Expression.PropertyOrField (exp, memberName);
+            } catch (Exception) {
+                return Expression.Call (exp, memberName, Type.EmptyTypes);
             }
         }
-        #endregion
-    }
 
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Method, AllowMultiple = true)]
-    public class TemplateParameter : Attribute
-    {
-        public string Name;
-        public string Property;
-
-        public TemplateParameter ()
+        private static Type GetReturnTypeOf (MemberInfo memberInfo)
         {
-        }
-
-        public TemplateParameter (string name)
-        {
-            this.Name = name;
+            if (memberInfo is PropertyInfo)
+                return ((PropertyInfo)memberInfo).PropertyType;
+            else if (memberInfo is FieldInfo)
+                return ((FieldInfo)memberInfo).FieldType;
+            else if (memberInfo is MethodInfo)
+                return ((MethodInfo)memberInfo).ReturnType;
+            else
+                throw new ArgumentException ("Unknown member.", "memberInfo");
         }
     }
 }

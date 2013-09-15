@@ -24,7 +24,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#if ENABLE_TESTS
 
 using System;
 using NUnit.Framework;
@@ -37,20 +36,15 @@ namespace Template.Text
     [TestFixture]
  	public class TemplateEngineV1Test
     {
-        #region Test Templates
         private const string Template_Ok_1_General = @"[F?<00>Track Number][?< of {0:00}>Track Count][?< - >Track Number][Artist] - [Album] [?<({0})>Album Year] - [Title] - Title uppercased: [TITLE], Title lowercased: [title], Title Length: [Title Length], TITLE length: [TITLE Length], Direct property access:[LowercasedTitle], Direct field access:[TrackNumber], Direct method access:[GetUppercasedTitle]";
         private const string Template_Ok_2_Simple = @"[F?<00>Track Number][?< of {0:00}>Track Count][?< - >Track Number][Artist] - [Album] [?<({0})>Album Year] - [Title]";
-        #endregion
 
-        #region Test Data
         private List<Song> songs = new List<Song>();
         private List<Artist> artists = new List<Artist>();
         private List<Album> albums = new List<Album>();
         private List<string> expectedStrings = new List<string>();
         private List<string> expectedStrings_2_Simple = new List<string>();
-        #endregion
 
-        #region Test Lifecycle Methods
         public TemplateEngineV1Test()
         {
             albums.Add(new Album() { Title = "Rock Hard", TrackCount = 12, Year = 1996 });
@@ -85,9 +79,7 @@ namespace Template.Text
             expectedStrings.Add(@" - Make Music, Not War (1803) - On the Fringe of Steffy - Title uppercased: ON THE FRINGE OF STEFFY, Title lowercased: on the fringe of steffy, Title Length: 23, TITLE length: 23, Direct property access:on the fringe of steffy, Direct field access:, Direct method access:ON THE FRINGE OF STEFFY");
             expectedStrings_2_Simple.Add(@" - Make Music, Not War (1803) - On the Fringe of Steffy");
         }
-        #endregion
 
-        #region Tests
         [Test]
         public void TestTemplates ()
         {
@@ -107,51 +99,5 @@ namespace Template.Text
                     checkExpected(i, str);
             }
         }
-        #endregion
     }
-
-    #region Data Source Classes
-    public class Song
-    {
-        [TemplateParameter("title")]
-        [TemplateParameter("Title Length", Property = "Length")]
-        public string Title;
-
-        [TemplateParameter(Property = "Name")]
-        public Artist Artist { get; set; }
-
-        [TemplateParameter("Track Number")]
-        public int? TrackNumber;
-
-        [TemplateParameter(Property = "Title")]
-        [TemplateParameter("Album Year", Property = "Year")]
-        [TemplateParameter("Track Count", Property = "TrackCount")]
-        public Album Album { get; set; }
-
-        [TemplateParameter("TITLE")]
-        [TemplateParameter("TITLE Length", Property = "Length")]
-        public string GetUppercasedTitle() {
-            return (Title ?? "").ToUpper();
-        }
-
-        [TemplateParameter("title")]
-        public string LowercasedTitle {
-            get { return (Title ?? "").ToLower(); }
-        }
-    }
-
-    public class Artist
-    {
-        public string Name { get; set; }
-    }
-
-    public class Album
-    {
-        public string Title { get; set; }
-        public int? Year { get; set; }
-        public int? TrackCount;
-    }
-    #endregion
 }
-
-#endif

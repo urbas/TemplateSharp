@@ -28,9 +28,10 @@ using System;
 namespace Template.Text
 {
     /// <summary>
-    /// Returns some data for the given object (data source).
+    /// Returns some data for the given data source object.
     /// </summary>
     public delegate object Lookup<in T>(T dataSource);
+
     /// <summary>
     /// Returns a data lookup function for the given parameter.
     /// </summary>
@@ -52,12 +53,12 @@ namespace Template.Text
         /// the data source and thereby fill out its (template's) placeholders (parameters).
         /// </para>
         /// </summary>
-        /// <exception cref="Banshee.Renamer.TemplateCompilationException">thrown if the
+        /// <exception cref="Template.Text.TemplateCompilationException">thrown if the
         /// compilation failed for any reason.</exception>
         ICompiledTemplate<T> CompileTemplate(string template, LookupMap<T> parameterMap);
 
         /// <summary>
-        /// Gets the name of this compiler.
+        /// Gets the name of this template engine.
         /// </summary>
         string Name { get; }
 
